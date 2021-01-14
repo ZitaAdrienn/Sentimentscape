@@ -1,26 +1,46 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
 
 library(shiny)
+library(tidyverse)
+library(DBI)
+library(RSQLite)
 
-# Define server logic required to draw a histogram
-shinyServer(function(input, output) {
 
-    output$distPlot <- renderPlot({
+shinyServer(function(input, output, session) {
 
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+  dataUpdated <- reactiveVal(FALSE)
+  
+  observeEvent(input$search, {
+    source("collect_data.R", local = TRUE)
+                 dataUpdated(TRUE)
+                 },
+               ignoreInit = TRUE)
 
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  sampleTweets <- eventReactive(dataUpdated(), {
+    conn <- dbConnect(RSQLite::SQLite(), "data/sentimentscape.db")
+    
+    sql_query <- "select text
+    from tw_text
+    order by random()
+    limit 5"
+    
+    sql_result <- dbGetQuery(conn, sql_query) %>%
+      pull()
 
-    })
+    dbDisconnect(conn)
+
+    isolate(dataUpdated(FALSE))
+    
+  sql_result
+  })
+  
+  output$text <- renderText({
+    sampleTweets()
+    "The  tweets below are examples from your data set:"
+  })
+  
+output$table <- renderTable({
+  sampleTweets()
+   sampleTweets()
+   })
 
 })

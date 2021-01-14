@@ -7,8 +7,8 @@ shinyUI(fluidPage(
   fluidRow(
     
     column(3,
-           textInput("terms", "Terms to check:"),
-           textInput("geolocation", "Geographical location:"),
+           textInput("search_term", "Terms to check:"),
+           textInput("search_place", "Geographical location:"),
            actionButton("search", "Load tweets!")
     ),
     
@@ -31,7 +31,7 @@ shinyUI(fluidPage(
   fluidRow(
     column(12,
            textOutput("text"),
-           tableOutput("tweets")
+           tableOutput("table")
     )
   )
 ))
