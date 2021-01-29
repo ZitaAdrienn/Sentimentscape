@@ -63,7 +63,7 @@ tw_text <- all_tweets %>%
     "user_id", "status_id", "created_at", "screen_name", "text",
     "favorite_count", "retweet_count", "quote_count", "reply_count", "hashtags",
     "symbols", "mentions_screen_name", "lang", "place_url", "place_name",
-    "place_full_name", "place_type", "country", "country_code", "geo_coords"
+    "place_full_name", "place_type", "country_code", "geo_coords", "status_url"
   ) %>%
   mutate(across(where(is.list), clean_list))
 

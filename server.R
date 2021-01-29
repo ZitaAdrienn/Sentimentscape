@@ -9,16 +9,23 @@ shinyServer(function(input, output, session) {
 
   dataUpdated <- reactiveVal(FALSE)
   
-  observeEvent(input$search, {
-    source("collect_data.R", local = TRUE)
+  observeEvent(input$search, 
+               ignoreInit = TRUE, {
+                 dataUpdated(FALSE)
+    source("collect_data.R",
+           local = TRUE)
                  dataUpdated(TRUE)
-                 },
-               ignoreInit = TRUE)
+                 })
 
-  sampleTweets <- eventReactive(dataUpdated(), {
+  sampleTweets <- eventReactive(dataUpdated(),
+                                ignoreInit = TRUE, {
+    req(dataUpdated())
+                                  
+    withProgress({
+
     conn <- dbConnect(RSQLite::SQLite(), "data/sentimentscape.db")
     
-    sql_query <- "select text
+    sql_query <- "select text || ' (' || status_url || ')'
     from tw_text
     order by random()
     limit 5"
@@ -27,10 +34,13 @@ shinyServer(function(input, output, session) {
       pull()
 
     dbDisconnect(conn)
-
-    isolate(dataUpdated(FALSE))
+    
+    setProgress(value = 1)
     
   sql_result
+  },
+  
+  message = "Sampling...")
   })
   
   output$text <- renderText({
@@ -40,7 +50,7 @@ shinyServer(function(input, output, session) {
   
 output$table <- renderTable({
   sampleTweets()
-   sampleTweets()
-   })
+   },
+  colnames = FALSE)
 
 })
