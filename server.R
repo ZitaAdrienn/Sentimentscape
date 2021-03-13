@@ -1,8 +1,7 @@
 
 library(shiny)
 library(tidyverse)
-library(DBI)
-library(RSQLite)
+library(tidyfst)
 
 
 shinyServer(function(input, output, session) {
@@ -22,22 +21,19 @@ shinyServer(function(input, output, session) {
     req(dataUpdated())
                                   
     withProgress({
+    tw_text <- parse_fst("data/tw_text.fst")
+    
+spl <-  sample(nrow(tw_text), 5)
 
-    conn <- dbConnect(RSQLite::SQLite(), "data/sentimentscape.db")
-    
-    sql_query <- "select text || ' (' || status_url || ')'
-    from tw_text
-    order by random()
-    limit 5"
-    
-    sql_result <- dbGetQuery(conn, sql_query) %>%
+    result <- tw_text %>%
+  select_fst(text, status_url) %>%
+      slice_fst(spl) %>%
+      transmute(tweets = paste0(text, " (", status_url, ")")) %>%
       pull()
-
-    dbDisconnect(conn)
     
     setProgress(value = 1)
     
-  sql_result
+  result
   },
   
   message = "Sampling...")
@@ -52,5 +48,4 @@ output$table <- renderTable({
   sampleTweets()
    },
   colnames = FALSE)
-
 })
