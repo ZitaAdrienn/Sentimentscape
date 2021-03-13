@@ -4,14 +4,6 @@ This is my new social listening and sentiment analysis project written in R.
 Before running the Shiny app you need to do the following:
 - Install required packages
 
-\ install.packages("rtweet", "tidyverse", "tidytext") \
-- Create your token for Twitter API
-\ token <- create_token(
-    app = "your_app",
-    consumer_key = "your_consumer_key",
-    consumer_secret = "your_consumer_secret",
-    access_token = "your_access_token",
-    access_secret = "your_access_secret",
-    set_renv = TRUE) \
+\ install.packages("rtweet", "tidyverse", "tidyfst", "tidytext") \
 
-For optaining your own Twitter API keys I recommend you to visit www.developer.twitter.com.
+- Create your token for Twitter API. You can find more information on setting it up here: https://cran.r-project.org/web/packages/rtweet/vignettes/auth.html
